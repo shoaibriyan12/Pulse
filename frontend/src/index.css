@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Default accent: teal. Values are "R G B" triplets (no commas) so
+     Tailwind's rgb(var(--accent) / <alpha-value>) pattern works. */
+  --accent: 45 212 191;
+  --accent-dark: 20 184 166;
+  --accent-secondary: 139 92 246;
+}
+
+/* Accent color presets — add a new color by adding a block here, plus an
+   entry in src/lib/theme.ts (used to render the swatch + label). Nothing
+   else in the app needs to change since every component already themes
+   off the pulse-teal / --accent variables. */
+html[data-accent='teal'] {
+  --accent: 45 212 191;
+  --accent-dark: 20 184 166;
+  --accent-secondary: 139 92 246;
+}
+html[data-accent='violet'] {
+  --accent: 139 92 246;
+  --accent-dark: 109 63 219;
+  --accent-secondary: 236 72 153;
+}
+html[data-accent='coral'] {
+  --accent: 255 107 91;
+  --accent-dark: 233 78 62;
+  --accent-secondary: 251 191 36;
+}
+html[data-accent='blue'] {
+  --accent: 56 189 248;
+  --accent-dark: 14 165 233;
+  --accent-secondary: 45 212 191;
+}
+html[data-accent='rose'] {
+  --accent: 244 63 94;
+  --accent-dark: 225 29 72;
+  --accent-secondary: 251 113 133;
+}
+html[data-accent='emerald'] {
+  --accent: 52 211 153;
+  --accent-dark: 16 185 129;
+  --accent-secondary: 56 189 248;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  html.light {
+    color-scheme: light;
+  }
+  body {
+    @apply bg-base-900 text-slate-100 font-body antialiased transition-colors duration-300;
+  }
+  html.light body {
+    @apply bg-slate-50 text-slate-800;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.25);
+    border-radius: 8px;
+  }
+  *:focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-glass;
+  }
+  html.light .glass-card {
+    @apply border-slate-200 bg-white/70 shadow-sm;
+  }
+  .glass-panel {
+    @apply relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl;
+  }
+  html.light .glass-panel {
+    @apply border-slate-200 bg-white/60;
+  }
+  .stat-figure {
+    @apply font-mono tabular-nums tracking-tight;
+  }
+}
+
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
