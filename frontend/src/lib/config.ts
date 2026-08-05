@@ -1,0 +1,5 @@
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  `${window.location.protocol}//${window.location.hostname}:4001`;
+
+export default API_BASE;

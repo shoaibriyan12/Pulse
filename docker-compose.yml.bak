@@ -9,15 +9,15 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: pulse2-backend:latest
-    container_name: pulse2-backend
+    image: pulse-backend:latest
+    container_name: pulse-backend
     restart: unless-stopped
     env_file:
       - ./backend/.env
     environment:
       PORT: 4000
     ports:
-      - "4001:4000"
+      - "4000:4000"
     networks:
       - pulse-net
     healthcheck:
@@ -32,13 +32,13 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://34.47.174.193:4001
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:4000}
         VITE_API_KEY: ${VITE_API_KEY:-}
-    image: pulse2-frontend:latest
-    container_name: pulse2-frontend
+    image: pulse-frontend:latest
+    container_name: pulse-frontend
     restart: unless-stopped
     ports:
-      - "8081:80"
+      - "8080:80"
     depends_on:
       - backend
     networks:

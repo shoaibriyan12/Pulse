@@ -94,31 +94,7 @@ useEffect(() => {
 
         if (dbSettings) {
 
-          setSettings(prev => ({
-
-            ...prev,
-
-            profile: {
-              ...prev.profile,
-              heightCm: dbSettings.heightCm ?? prev.profile.heightCm,
-              startWeightKg: dbSettings.startWeightKg ?? prev.profile.startWeightKg,
-            },
-
-            goals: {
-              ...prev.goals,
-              calorieGoal: dbSettings.calorieGoal ?? prev.goals.calorieGoal,
-              proteinGoal: dbSettings.proteinGoal ?? prev.goals.proteinGoal,
-              carbLimit: dbSettings.carbLimit ?? prev.goals.carbLimit,
-              fatGoal: dbSettings.fatGoal ?? prev.goals.fatGoal,
-              goalWeightKg: dbSettings.goalWeightKg ?? prev.goals.goalWeightKg,
-            },
-
-            appearance: {
-              ...prev.appearance,
-              theme: dbSettings.theme ?? prev.appearance.theme,
-            }
-
-          }));
+          setSettings(dbSettings);
 
         }
 

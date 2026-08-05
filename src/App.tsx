@@ -26,7 +26,6 @@ import {
   DEFAULT_PROFILE,
   DEFAULT_INTEGRATIONS
 } from './types';
-import api from './lib/api';
 
 export default function App() {
   // --- STATE SYSTEM (BACKED BY LOCALSTORAGE PERSISTENCE) ---
@@ -70,78 +69,6 @@ export default function App() {
   const [editingEntry, setEditingEntry] = useState<FitnessEntry | null>(null);
   const [customAddDate, setCustomAddDate] = useState<string | null>(null);
 
-// ------------------------------------------------
-// Backend Sync
-// ------------------------------------------------
-
-useEffect(() => {
-
-  const loadBackendData = async () => {
-
-    try {
-
-      const dbEntries = await api.getEntries();
-
-      if (dbEntries && Object.keys(dbEntries).length > 0) {
-
-        setEntries(Object.values(dbEntries));
-
-      }
-
-      try {
-
-        const dbSettings = await api.getSettings();
-
-        if (dbSettings) {
-
-          setSettings(prev => ({
-
-            ...prev,
-
-            profile: {
-              ...prev.profile,
-              heightCm: dbSettings.heightCm ?? prev.profile.heightCm,
-              startWeightKg: dbSettings.startWeightKg ?? prev.profile.startWeightKg,
-            },
-
-            goals: {
-              ...prev.goals,
-              calorieGoal: dbSettings.calorieGoal ?? prev.goals.calorieGoal,
-              proteinGoal: dbSettings.proteinGoal ?? prev.goals.proteinGoal,
-              carbLimit: dbSettings.carbLimit ?? prev.goals.carbLimit,
-              fatGoal: dbSettings.fatGoal ?? prev.goals.fatGoal,
-              goalWeightKg: dbSettings.goalWeightKg ?? prev.goals.goalWeightKg,
-            },
-
-            appearance: {
-              ...prev.appearance,
-              theme: dbSettings.theme ?? prev.appearance.theme,
-            }
-
-          }));
-
-        }
-
-      } catch (e) {
-
-        console.warn("Settings API unavailable.");
-
-      }
-
-    } catch (e) {
-
-      console.warn("Backend unavailable, keeping LocalStorage.");
-
-    }
-
-  };
-
-  loadBackendData();
-
-}, []);
-
-
-
   // Sync to LocalStorage on updates
   useEffect(() => {
     localStorage.setItem('pulsefit_logs_db', JSON.stringify(entries));
@@ -173,53 +100,30 @@ useEffect(() => {
   // --- CONTROLLER FUNCTIONS ---
 
   // Create or Update log entry
-  const handleSaveEntry = async (newEntry: FitnessEntry) => {
-
-    try {
-
-      await api.saveEntry(newEntry);
-
-      const dbEntries = await api.getEntries();
-
-      setEntries(Object.values(dbEntries) as FitnessEntry[]);
-
-      setEditingEntry(null);
-
-      setCustomAddDate(null);
-
-    } catch (err) {
-
-      console.error(err);
-
-      alert("Failed to save entry.");
-
-    }
-
+  const handleSaveEntry = (newEntry: FitnessEntry) => {
+    setEntries((prev) => {
+      const existsIndex = prev.findIndex((e) => e.date === newEntry.date);
+      if (existsIndex > -1) {
+        const updated = [...prev];
+        updated[existsIndex] = {
+          ...prev[existsIndex],
+          ...newEntry,
+          updatedAt: new Date().toISOString()
+        };
+        return updated;
+      } else {
+        return [...prev, newEntry];
+      }
+    });
+    setEditingEntry(null);
+    setCustomAddDate(null);
   };
 
   // Erase log record
-  const handleDeleteEntry = async (date: string) => {
-
-    if (!window.confirm(`Are you sure you want to delete the log record for ${date}?`)) {
-      return;
+  const handleDeleteEntry = (date: string) => {
+    if (window.confirm(`Are you sure you want to delete the log record for ${date}?`)) {
+      setEntries((prev) => prev.filter((e) => e.date !== date));
     }
-
-    try {
-
-      await api.deleteEntry(date);
-
-      const dbEntries = await api.getEntries();
-
-      setEntries(Object.values(dbEntries) as FitnessEntry[]);
-
-    } catch (err) {
-
-      console.error(err);
-
-      alert("Failed to delete entry.");
-
-    }
-
   };
 
   // Trigger modal for editing an existing record
